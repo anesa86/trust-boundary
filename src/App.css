@@ -319,7 +319,7 @@
   transition: background 0.15s, color 0.15s;
 }
 
-.segments button:hover:not(:disabled) {
+.segments button:hover:not(:disabled):not([aria-pressed='true']) {
   background: var(--surface-sunken);
 }
 
@@ -365,7 +365,11 @@
 }
 
 .zone-status {
-  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 28px;
+  align-items: center;
+  padding: 18px 24px;
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
   transition: background 0.2s, border-color 0.2s;
@@ -386,21 +390,17 @@
   border-color: color-mix(in srgb, var(--zone-outside) 30%, transparent);
 }
 
-.zone-kicker {
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
 .zone-title {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 4px;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 650;
+  line-height: 1.3;
 }
 
 .zone-dot {
+  flex: none;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -419,17 +419,14 @@
 }
 
 .zone-desc {
-  margin-top: 6px;
+  margin-top: 2px;
+  font-size: 14px;
   color: var(--ink-2);
 }
 
 .zone-figures {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  display: flex;
+  gap: 28px;
 }
 
 .zone-figures dt {
@@ -439,20 +436,19 @@
 
 .zone-figures dd {
   margin-top: 2px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 720px) {
-  .zone-figures {
-    grid-template-columns: 1fr 1fr;
-  }
+.manual-review,
+.calc-note {
+  grid-column: 1 / -1;
 }
 
 .manual-review {
-  margin-top: 16px;
-  padding: 10px 14px;
+  margin-top: 10px;
+  padding: 9px 14px;
   border-radius: var(--radius-sm);
   background: var(--surface);
   font-size: 14px;
@@ -464,19 +460,214 @@
 }
 
 .calc-note {
-  margin-top: 14px;
+  margin-top: 6px;
   font-size: 12px;
   color: var(--ink-3);
 }
 
-/* M3b 之前的佔位區 */
-.boundary-placeholder {
-  display: grid;
-  place-items: center;
-  min-height: 340px;
-  border: 1px dashed var(--line-strong);
+@media (max-width: 720px) {
+  .zone-status {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================
+   信任邊界圖
+   ===================================================== */
+
+.boundary-card {
+  padding: 20px 24px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  font-size: 14px;
+}
+
+.boundary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: 6px;
+}
+
+.boundary-title {
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.boundary-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.boundary-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.swatch-recommended {
+  background: var(--zone-recommended-soft);
+  box-shadow: inset 0 0 0 1px var(--zone-recommended);
+}
+
+.swatch-review {
+  background: var(--zone-review-soft);
+  box-shadow: inset 0 0 0 1px var(--zone-review);
+}
+
+.swatch-outside {
+  background: var(--zone-outside-soft);
+  box-shadow: inset 0 0 0 1px var(--zone-outside);
+}
+
+.boundary-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-sans);
+}
+
+.grid-line {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.tick-label {
+  font-size: 12px;
+  fill: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.zone-recommended {
+  fill: var(--zone-recommended-soft);
+}
+
+.zone-review {
+  fill: var(--zone-review-soft);
+}
+
+.zone-outside {
+  fill: var(--zone-outside-soft);
+}
+
+.boundary-line {
+  stroke-width: 2;
+}
+
+.boundary-recommended {
+  stroke: var(--zone-recommended);
+}
+
+.boundary-review {
+  stroke: var(--zone-review);
+}
+
+.term-column {
+  transition: opacity 0.2s;
+}
+
+.term-column.is-muted {
+  opacity: 0.35;
+}
+
+.term-label {
+  font-size: 13px;
+  fill: var(--ink-2);
+}
+
+.term-label.is-active {
+  font-weight: 650;
+  fill: var(--ink);
+}
+
+.boundary-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.boundary-values strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.boundary-values .value-recommended::before,
+.boundary-values .value-review::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.boundary-values .value-recommended::before {
+  background: var(--zone-recommended);
+}
+
+.boundary-values .value-review::before {
+  background: var(--zone-review);
+}
+
+.deal-point {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.deal-halo {
+  fill: var(--surface);
+  opacity: 0.85;
+}
+
+.deal-dot {
+  stroke: var(--surface);
+  stroke-width: 3;
+}
+
+.deal-recommended .deal-dot {
+  fill: var(--zone-recommended);
+}
+
+.deal-review .deal-dot {
+  fill: var(--zone-review);
+}
+
+.deal-outside .deal-dot {
+  fill: var(--zone-outside);
+}
+
+.deal-label {
+  font-size: 13px;
+  font-weight: 650;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.axis-title {
+  font-size: 12px;
+  fill: var(--ink-3);
+}
+
+.boundary-note {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
   color: var(--ink-3);
-  text-align: center;
 }

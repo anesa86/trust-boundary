@@ -9,10 +9,11 @@ import { evaluateDeal } from './engine/decisionEngine.js'
 import BuyerCard from './components/BuyerCard.jsx'
 import DealControls from './components/DealControls.jsx'
 import ZoneStatus from './components/ZoneStatus.jsx'
+import TrustBoundaryChart from './components/TrustBoundaryChart.jsx'
 
 const NO_LOCKS = { amount: false, term: false, deposit: false }
 
-// 金額滑桿的上限：覆核上限的 1.5 倍，取整到百萬（純顯示用）
+// 金額滑桿與信任邊界圖縱軸的上限：覆核上限的 1.5 倍，取整到百萬（純顯示用）
 function getAmountMax(buyer) {
   const reviewLimit = buyer.baseCreditCapacity * policy.reviewBuffer
   return Math.max(1000000, Math.ceil((reviewLimit * 1.5) / 1000000) * 1000000)
@@ -25,6 +26,7 @@ export default function App() {
 
   const buyer = buyers.find((b) => b.id === buyerId)
   const evaluation = evaluateDeal(buyer, deal, policy)
+  const amountMax = getAmountMax(buyer)
 
   function selectBuyer(id) {
     setBuyerId(id)
@@ -74,7 +76,7 @@ export default function App() {
             deal={deal}
             locks={locks}
             policy={policy}
-            amountMax={getAmountMax(buyer)}
+            amountMax={amountMax}
             onChange={updateDeal}
             onToggleLock={toggleLock}
           />
@@ -82,9 +84,13 @@ export default function App() {
 
         <section className="panel-right" aria-label="評估結果">
           <ZoneStatus evaluation={evaluation} />
-          <div className="boundary-placeholder">
-            信任邊界圖將在 M3b 加入
-          </div>
+          <TrustBoundaryChart
+            buyer={buyer}
+            policy={policy}
+            evaluation={evaluation}
+            yMax={amountMax}
+            termLocked={locks.term}
+          />
         </section>
       </main>
     </div>

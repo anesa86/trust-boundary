@@ -20,18 +20,15 @@ export default function ZoneStatus({ evaluation }) {
 
   return (
     <section className="zone-status" data-zone={evaluation.zone} aria-live="polite">
-      <p className="zone-kicker">本次交易目前位置</p>
-      <h2 className="zone-title">
-        <span className="zone-dot" aria-hidden="true" />
-        {copy.title}
-      </h2>
-      <p className="zone-desc">{copy.desc}</p>
+      <div className="zone-main">
+        <h2 className="zone-title">
+          <span className="zone-dot" aria-hidden="true" />
+          {copy.title}
+        </h2>
+        <p className="zone-desc">{copy.desc}</p>
+      </div>
 
       <dl className="zone-figures">
-        <div>
-          <dt>本次未擔保曝險</dt>
-          <dd>{formatNTD(evaluation.unsecuredExposure)}</dd>
-        </div>
         <div>
           <dt>交易後政策調整曝險</dt>
           <dd>{formatNTD(evaluation.policyAdjustedExposure)}</dd>
@@ -39,10 +36,6 @@ export default function ZoneStatus({ evaluation }) {
         <div>
           <dt>建議範圍上限</dt>
           <dd>{formatNTD(evaluation.recommendedLimit)}</dd>
-        </div>
-        <div>
-          <dt>覆核範圍上限</dt>
-          <dd>{formatNTD(evaluation.reviewLimit)}</dd>
         </div>
       </dl>
 

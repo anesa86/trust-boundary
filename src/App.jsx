@@ -1,122 +1,92 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import { buyers } from './data/buyers.js'
+import { policy } from './data/policy.js'
+import { demoDeals } from './data/demoDeals.js'
+import { evaluateDeal } from './engine/decisionEngine.js'
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+import BuyerCard from './components/BuyerCard.jsx'
+import DealControls from './components/DealControls.jsx'
+import ZoneStatus from './components/ZoneStatus.jsx'
 
-      <div className="ticks"></div>
+const NO_LOCKS = { amount: false, term: false, deposit: false }
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// 金額滑桿的上限：覆核上限的 1.5 倍，取整到百萬（純顯示用）
+function getAmountMax(buyer) {
+  const reviewLimit = buyer.baseCreditCapacity * policy.reviewBuffer
+  return Math.max(1000000, Math.ceil((reviewLimit * 1.5) / 1000000) * 1000000)
 }
 
-export default App
+export default function App() {
+  const [buyerId, setBuyerId] = useState(buyers[0].id)
+  const [deal, setDeal] = useState(demoDeals[buyers[0].id])
+  const [locks, setLocks] = useState(NO_LOCKS)
+
+  const buyer = buyers.find((b) => b.id === buyerId)
+  const evaluation = evaluateDeal(buyer, deal, policy)
+
+  function selectBuyer(id) {
+    setBuyerId(id)
+    setDeal(demoDeals[id])
+    setLocks(NO_LOCKS)
+  }
+
+  function updateDeal(patch) {
+    setDeal((current) => ({ ...current, ...patch }))
+  }
+
+  function toggleLock(key) {
+    setLocks((current) => ({ ...current, [key]: !current[key] }))
+  }
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <h1 className="brand-name">
+          信任邊界<span className="brand-en">Trust Boundary</span>
+        </h1>
+        <p className="brand-sub">買家信用與條件式授信決策</p>
+        <span className="prototype-tag">Prototype 模擬資料</span>
+      </header>
+
+      <main className="workspace">
+        <aside className="panel-left">
+          <div className="panel-section">
+            <div className="buyer-switch" role="tablist" aria-label="選擇 Buyer">
+              {buyers.map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={b.id === buyerId}
+                  onClick={() => selectBuyer(b.id)}
+                >
+                  {b.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <BuyerCard buyer={buyer} />
+
+          <DealControls
+            deal={deal}
+            locks={locks}
+            policy={policy}
+            amountMax={getAmountMax(buyer)}
+            onChange={updateDeal}
+            onToggleLock={toggleLock}
+          />
+        </aside>
+
+        <section className="panel-right" aria-label="評估結果">
+          <ZoneStatus evaluation={evaluation} />
+          <div className="boundary-placeholder">
+            信任邊界圖將在 M3b 加入
+          </div>
+        </section>
+      </main>
+    </div>
+  )
+}

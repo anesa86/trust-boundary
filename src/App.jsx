@@ -10,6 +10,8 @@ import BuyerCard from './components/BuyerCard.jsx'
 import DealControls from './components/DealControls.jsx'
 import ZoneStatus from './components/ZoneStatus.jsx'
 import TrustBoundaryChart from './components/TrustBoundaryChart.jsx'
+import ActionPanel from './components/ActionPanel.jsx'
+import WhyPanel from './components/WhyPanel.jsx'
 
 const NO_LOCKS = { amount: false, term: false, deposit: false }
 
@@ -91,6 +93,15 @@ export default function App() {
             yMax={amountMax}
             termLocked={locks.term}
           />
+          <ActionPanel
+            buyer={buyer}
+            deal={deal}
+            policy={policy}
+            locks={locks}
+            evaluation={evaluation}
+            onApply={updateDeal}
+          />
+          <WhyPanel buyer={buyer} evaluation={evaluation} />
         </section>
       </main>
     </div>

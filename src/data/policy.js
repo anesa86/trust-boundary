@@ -10,7 +10,8 @@
 //
 // 單位說明：
 // - allowedPaymentTerms：帳期天數
-// - termMultipliers：示範企業對不同帳期設定的保守係數（政策選擇，非預測）
+// - termPolicyFactors：示範企業對不同帳期設定的信用政策係數
+//   （政策選擇；非 AI 預測、非違約風險倍率、非產業標準）
 // - allowedDepositRatios：0 到 1 之間的小數（0.30 = 30%）
 // - amountStep：新台幣（NT$）
 //
@@ -28,7 +29,7 @@ export const policy = {
   
     allowedPaymentTerms: [30, 45, 60, 90],
   
-    termMultipliers: {
+    termPolicyFactors: {
       30: 1.00,
       45: 1.05,
       60: 1.10,

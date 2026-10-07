@@ -27,3 +27,5 @@ dist-ssr
 .env
 .env.*
 !.env.example
+# ML evidence raw data - do not commit
+ml-evidence/data/*.csv

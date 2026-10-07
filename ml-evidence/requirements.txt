@@ -1,0 +1,4 @@
+# ML evidence experiment only — the Trust Boundary website does not use these.
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.5

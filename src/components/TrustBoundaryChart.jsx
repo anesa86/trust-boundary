@@ -1,9 +1,9 @@
 import { getTrustBoundaries } from '../lib/boundary.js'
-import { formatNTD, formatNTDCompact } from '../lib/format.js'
+import { formatNTDCompact } from '../lib/format.js'
 
 const WIDTH = 720
-const HEIGHT = 380
-const MARGIN = { top: 24, right: 24, bottom: 46, left: 64 }
+const HEIGHT = 280
+const MARGIN = { top: 30, right: 24, bottom: 30, left: 64 }
 const PLOT_W = WIDTH - MARGIN.left - MARGIN.right
 const PLOT_H = HEIGHT - MARGIN.top - MARGIN.bottom
 const COLUMN_GAP = 18
@@ -45,6 +45,21 @@ export default function TrustBoundaryChart({ buyer, policy, evaluation, yMax, te
   const pointY = y(evaluation.unsecuredExposure)
   const isClipped = evaluation.unsecuredExposure > yMax
 
+  // 交易點標籤：預設放在點的上方；如果會壓到這一欄的邊界線，改放到點的下方
+  // 只調整文字位置，交易點本身的座標不變
+  const labelOffset = (() => {
+    if (!active) return -24
+    const lineYs = [y(active.recommended), y(active.review)]
+    const plotTop = MARGIN.top
+    const plotBottom = HEIGHT - MARGIN.bottom
+    const fits = (offset) => {
+      const top = pointY + offset - 13
+      const bottom = pointY + offset + 4
+      return top >= plotTop && bottom <= plotBottom && lineYs.every((lineY) => lineY < top || lineY > bottom)
+    }
+    return [-24, 32].find(fits) ?? -24
+  })()
+
   return (
     <section className="boundary-card" aria-label="信任邊界">
       <div className="boundary-head">
@@ -60,8 +75,24 @@ export default function TrustBoundaryChart({ buyer, policy, evaluation, yMax, te
         className="boundary-svg"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
-        aria-label={`本次交易未擔保曝險 ${formatNTD(evaluation.unsecuredExposure)}，帳期 Net${evaluation.paymentTermDays}，${ZONE_LABEL[evaluation.zone]}`}
+        aria-label={`本次未擔保曝險 ${formatNTDCompact(evaluation.unsecuredExposure)}，帳期 Net${evaluation.paymentTermDays}，${ZONE_LABEL[evaluation.zone]}`}
       >
+        {/* 縱軸名稱（左上）與目前帳期的政策邊界（右上）：共用圖表上方同一行 */}
+        <text className="axis-title" x={MARGIN.left - 52} y={14}>
+          本次未擔保曝險（NT$）
+        </text>
+        {active && (
+          <text className="boundary-values-svg" x={WIDTH - MARGIN.right} y={14} textAnchor="end">
+            <tspan>Net{active.paymentTermDays} 政策邊界</tspan>
+            <tspan className="value-recommended-svg" dx="14">━ </tspan>
+            <tspan>建議上限 </tspan>
+            <tspan className="value-strong">{formatNTDCompact(active.recommended)}</tspan>
+            <tspan className="value-review-svg" dx="14">━ </tspan>
+            <tspan>覆核上限 </tspan>
+            <tspan className="value-strong">{formatNTDCompact(active.review)}</tspan>
+          </text>
+        )}
+
         {/* 縱軸刻度 */}
         {ticks.map((value) => (
           <g key={value}>
@@ -113,36 +144,15 @@ export default function TrustBoundaryChart({ buyer, policy, evaluation, yMax, te
         >
           <circle className="deal-halo" r="16" />
           <circle className="deal-dot" r="7" />
-          <text className="deal-label" y="-24" textAnchor="middle">
+          <text className="deal-label" y={labelOffset} textAnchor="middle">
             本次交易 {formatNTDCompact(evaluation.unsecuredExposure)}
             {isClipped ? ' ↑' : ''}
           </text>
         </g>
-
-        <text
-          className="axis-title"
-          x={MARGIN.left}
-          y={HEIGHT - 6}
-        >
-          付款帳期（僅限公司政策允許的 4 種帳期）
-        </text>
       </svg>
 
-      {active && (
-        <p className="boundary-values">
-          <span>Net{active.paymentTermDays} 的政策邊界</span>
-          <span className="value-recommended">
-            建議上限 <strong>{formatNTD(active.recommended)}</strong>
-          </span>
-          <span className="value-review">
-            覆核上限 <strong>{formatNTD(active.review)}</strong>
-          </span>
-        </p>
-      )}
-
       <p className="boundary-note">
-        縱軸為本次交易未擔保曝險（交易金額 ×（1 − 訂金比例））。邊界由 M2 決策引擎依 Buyer 目前曝險{' '}
-        {formatNTDCompact(buyer.currentExposure)} 與 Prototype 帳期政策係數計算，帳期越長，可承擔的空間越小。
+        橫軸僅含示範企業信用政策允許的 4 種帳期；帳期越長，允許的空間越小。邊界已計入 Buyer 目前曝險 {formatNTDCompact(buyer.currentExposure)}。
       </p>
     </section>
   )

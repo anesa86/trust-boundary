@@ -81,9 +81,9 @@ function AmountControl({ value, step, max, locked, onChange }) {
             step={step}
             value={value}
             aria-label="交易金額滑桿"
+            title="每次調整 NT$100,000（依 Prototype 示範政策）"
             onChange={(event) => onChange(Number(event.target.value))}
           />
-          <p className="amount-hint">最小調整單位 NT$100,000（依 Prototype 示範政策）</p>
         </>
       )}
     </>

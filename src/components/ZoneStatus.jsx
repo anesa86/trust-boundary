@@ -1,4 +1,4 @@
-import { formatNTD } from '../lib/format.js'
+import { formatNTDCompact } from '../lib/format.js'
 
 const ZONE_COPY = {
   recommended: {
@@ -7,7 +7,7 @@ const ZONE_COPY = {
   },
   review: {
     title: '需要主管覆核',
-    desc: '交易後曝險超過建議範圍，但仍在可覆核的區間內。',
+    desc: '政策評估曝險超過建議範圍，但仍在可覆核的區間內。',
   },
   outside: {
     title: '超出目前信用政策',
@@ -17,6 +17,11 @@ const ZONE_COPY = {
 
 export default function ZoneStatus({ evaluation }) {
   const copy = ZONE_COPY[evaluation.zone]
+  // 資料可信度低的新 Buyer：zone 與人工覆核是兩個不同概念，說明文字分開講清楚
+  const desc =
+    evaluation.requiresManualReview && evaluation.zone === 'recommended'
+      ? '交易落在新合作對象的起始信用政策範圍內。'
+      : copy.desc
 
   return (
     <section className="zone-status" data-zone={evaluation.zone} aria-live="polite">
@@ -25,30 +30,29 @@ export default function ZoneStatus({ evaluation }) {
           <span className="zone-dot" aria-hidden="true" />
           {copy.title}
         </h2>
-        <p className="zone-desc">{copy.desc}</p>
+        <p className="zone-desc">{desc}</p>
       </div>
 
-      <dl className="zone-figures">
-        <div>
-          <dt>交易後政策調整曝險</dt>
-          <dd>{formatNTD(evaluation.policyAdjustedExposure)}</dd>
-        </div>
-        <div>
-          <dt>建議範圍上限</dt>
-          <dd>{formatNTD(evaluation.recommendedLimit)}</dd>
-        </div>
-      </dl>
+      <div className="zone-side">
+        <dl className="zone-figures">
+          <div>
+            <dt>政策評估曝險</dt>
+            <dd>{formatNTDCompact(evaluation.policyAdjustedExposure)}</dd>
+          </div>
+          <div>
+            <dt>建議範圍上限</dt>
+            <dd>{formatNTDCompact(evaluation.recommendedLimit)}</dd>
+          </div>
+        </dl>
+        <p className="calc-note">依 Prototype 示範企業信用政策計算，非 AI 預測</p>
+      </div>
 
       {evaluation.requiresManualReview && (
         <p className="manual-review">
-          <strong>資料可信度低，需要人工覆核。</strong>
-          即使落在建議範圍，也不可視為自動核准。
+          <strong>內部交易資料不足，需要人工覆核，不代表自動核准。</strong>
         </p>
       )}
 
-      <p className="calc-note">
-        依 Prototype 示範企業信用政策計算（帳期政策係數 ×{evaluation.termPolicyFactor.toFixed(2)}），非 AI 預測
-      </p>
     </section>
   )
 }

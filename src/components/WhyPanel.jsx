@@ -28,7 +28,7 @@ export default function WhyPanel({ buyer, evaluation, ai, onRequestAi }) {
           <div className="compare-row">
             <dt>付款帳期</dt>
             <dd>
-              典型 {buyer.typicalPaymentTermDays} 天 → 本次 {evaluation.paymentTermDays} 天
+              典型 Net{buyer.typicalPaymentTermDays} → 本次 Net{evaluation.paymentTermDays}
             </dd>
             <dd className="compare-delta">
               {history.termDiffDays === 0
@@ -39,7 +39,7 @@ export default function WhyPanel({ buyer, evaluation, ai, onRequestAi }) {
           <div className="compare-row">
             <dt>信用曝險</dt>
             <dd>
-              目前 {formatNTDCompact(buyer.currentExposure)} → 交易後 {formatNTDCompact(evaluation.policyAdjustedExposure)}（政策調整後）
+              目前 {formatNTDCompact(buyer.currentExposure)} → 政策評估曝險 {formatNTDCompact(evaluation.policyAdjustedExposure)}
             </dd>
             <dd className="compare-delta" />
           </div>

@@ -1,5 +1,5 @@
 import { findFeasibleAdjustments } from '../engine/decisionEngine.js'
-import { formatNTD, formatPercent } from '../lib/format.js'
+import { formatNTDCompact, formatPercent } from '../lib/format.js'
 
 const OPTIONS = [
   {
@@ -13,7 +13,7 @@ const OPTIONS = [
     key: 'amount',
     lockKey: 'amount',
     label: '只調整金額',
-    describe: (value) => `交易金額降至 ${formatNTD(value)}`,
+    describe: (value) => `交易金額降至 ${formatNTDCompact(value)}`,
     patch: (value) => ({ dealAmount: value }),
   },
   {
@@ -26,7 +26,7 @@ const OPTIONS = [
 ]
 
 const LOCK_TEXT = {
-  amount: (deal) => formatNTD(deal.dealAmount),
+  amount: (deal) => formatNTDCompact(deal.dealAmount),
   term: (deal) => `Net${deal.paymentTermDays}`,
   deposit: (deal) => `訂金 ${formatPercent(deal.depositRatio)}`,
 }
@@ -55,7 +55,7 @@ export default function ActionPanel({ buyer, deal, policy, locks, evaluation, on
       {adjustments.noAdjustmentNeeded ? (
         <p className="action-empty">
           目前條件已在建議授信範圍內，不需要調整。
-          {evaluation.requiresManualReview && '但 Buyer 資料可信度低，仍需人工覆核。'}
+          {evaluation.requiresManualReview && '但內部交易資料不足，仍需人工覆核。'}
         </p>
       ) : allLocked ? (
         <div className="action-empty">
@@ -74,6 +74,7 @@ export default function ActionPanel({ buyer, deal, policy, locks, evaluation, on
               return (
                 <li key={option.key} className="action-item">
                   <p className="action-label">{option.label}</p>
+                  <div className="action-body">
                   {recommended !== null ? (
                     <div className="action-row">
                       <p className="action-main">
@@ -106,12 +107,13 @@ export default function ActionPanel({ buyer, deal, policy, locks, evaluation, on
                       </button>
                     </div>
                   )}
+                  </div>
                 </li>
               )
             })}
           </ul>
           {evaluation.requiresManualReview && (
-            <p className="action-footnote">Buyer 資料可信度低：即使調整後進入建議範圍，仍需人工覆核。</p>
+            <p className="action-footnote">內部交易資料不足：即使調整後進入建議範圍，仍需人工覆核。</p>
           )}
         </>
       )}

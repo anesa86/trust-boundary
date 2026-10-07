@@ -10,7 +10,7 @@
 // AI 掛掉時，這份就是 fallback，所以必須永遠保留。
 // =====================================================
 
-import { formatNTD, formatNTDCompact } from './format.js'
+import { formatNTDCompact } from './format.js'
 
 const SUMMARY = {
   recommended: '本次交易落在建議授信範圍內。',
@@ -51,7 +51,7 @@ export function buildDeterministicExplanation(buyer, evaluation) {
 
   if (evaluation.zone !== 'recommended') {
     const over = evaluation.policyAdjustedExposure - evaluation.recommendedLimit
-    reasons.push(`交易後政策調整曝險高於建議範圍上限 ${formatNTD(over)}`)
+    reasons.push(`政策評估曝險高於建議範圍上限 ${formatNTDCompact(over)}`)
   }
 
   if (history.hasHistory && history.amountRatio >= 1.5) {
@@ -63,7 +63,7 @@ export function buildDeterministicExplanation(buyer, evaluation) {
   }
 
   if (evaluation.requiresManualReview) {
-    reasons.push('Buyer 資料可信度低，結果需要人工覆核')
+    reasons.push('內部交易資料不足，結果需要人工覆核')
   }
 
   if (buyer.currentExposure > 0) {
@@ -74,7 +74,7 @@ export function buildDeterministicExplanation(buyer, evaluation) {
     ? `${buyer.name} 為新合作對象，內部付款紀錄尚在建立中。`
     : `${buyer.name} 信用狀態 ${buyer.riskGradeLabel}｜${buyer.creditHealthLabel}；${buyer.recentPaymentTrendLabel}。`
 
-  const dealStatus = `交易後政策調整曝險 ${formatNTD(evaluation.policyAdjustedExposure)}，建議範圍上限 ${formatNTD(evaluation.recommendedLimit)}。`
+  const dealStatus = `政策評估曝險 ${formatNTDCompact(evaluation.policyAdjustedExposure)}，建議範圍上限 ${formatNTDCompact(evaluation.recommendedLimit)}。`
 
   let humanNote
   if (buyer.riskConfidence === 'low') {

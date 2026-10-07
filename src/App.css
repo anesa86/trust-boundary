@@ -12,7 +12,7 @@
   display: flex;
   align-items: baseline;
   gap: 16px;
-  padding: 20px 0 18px;
+  padding: 16px 0 14px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -47,7 +47,7 @@
   display: grid;
   grid-template-columns: minmax(380px, 420px) 1fr;
   gap: 28px;
-  padding-top: 24px;
+  padding-top: 18px;
   align-items: start;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .panel-section {
-  padding: 18px 22px;
+  padding: 14px 22px;
 }
 
 .panel-section + .panel-section {
@@ -84,7 +84,7 @@
 }
 
 .section-title {
-  margin-bottom: 14px;
+  margin-bottom: 8px;
   font-size: 13px;
   font-weight: 600;
   color: var(--ink-3);
@@ -125,18 +125,30 @@
 }
 
 .buyer-name-en {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
   color: var(--ink-3);
 }
 
+.case-tag {
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
 .buyer-tenure {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 13px;
   color: var(--ink-3);
 }
 
 .buyer-state {
-  margin-top: 10px;
+  margin-top: 6px;
   font-size: 16px;
   color: var(--ink-2);
 }
@@ -149,8 +161,8 @@
 .facts {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
-  gap: 12px 20px;
-  margin-top: 14px;
+  gap: 10px 20px;
+  margin-top: 10px;
 }
 
 .facts dt {
@@ -194,7 +206,7 @@
    ===================================================== */
 
 .control {
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 .control:first-of-type {
@@ -209,7 +221,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .control-label {
@@ -299,12 +311,6 @@
   accent-color: var(--action);
 }
 
-.amount-hint {
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--ink-3);
-}
-
 /* 帳期、訂金：分段選擇 */
 .segments {
   display: flex;
@@ -366,7 +372,7 @@
 
 .panel-right {
   display: grid;
-  gap: 20px;
+  gap: 12px;
 }
 
 .zone-status {
@@ -374,7 +380,7 @@
   grid-template-columns: 1fr auto;
   gap: 4px 28px;
   align-items: center;
-  padding: 18px 24px;
+  padding: 12px 24px;
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
   transition: background 0.2s, border-color 0.2s;
@@ -429,6 +435,12 @@
   color: var(--ink-2);
 }
 
+.zone-side {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+}
+
 .zone-figures {
   display: flex;
   gap: 28px;
@@ -446,13 +458,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-.manual-review,
-.calc-note {
+.manual-review {
   grid-column: 1 / -1;
 }
 
 .manual-review {
-  margin-top: 10px;
+  margin-top: 8px;
   padding: 9px 14px;
   border-radius: var(--radius-sm);
   background: var(--surface);
@@ -465,7 +476,7 @@
 }
 
 .calc-note {
-  margin-top: 6px;
+  margin-top: 2px;
   font-size: 12px;
   color: var(--ink-3);
 }
@@ -481,7 +492,7 @@
    ===================================================== */
 
 .boundary-card {
-  padding: 20px 24px 18px;
+  padding: 12px 24px 10px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -493,7 +504,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 8px 20px;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 .boundary-title {
@@ -540,6 +551,10 @@
   display: block;
   width: 100%;
   height: auto;
+  /* 視窗較矮時（例如筆電瀏覽器扣掉分頁列後），圖表等比例縮小，
+     讓第一條建議仍留在第一屏；一般高度時不受影響 */
+  max-height: clamp(250px, calc(100vh - 466px), 360px);
+  margin: 0 auto;
   font-family: var(--font-sans);
 }
 
@@ -596,29 +611,23 @@
   fill: var(--ink);
 }
 
-.boundary-values {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 20px;
-  margin-top: 4px;
-  font-size: 13px;
-  color: var(--ink-2);
+.boundary-values-svg {
+  font-size: 12px;
+  fill: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
 
-.boundary-values strong {
-  color: var(--ink);
+.boundary-values-svg .value-strong {
+  fill: var(--ink);
   font-weight: 600;
 }
 
-.boundary-values .value-recommended::before,
-.boundary-values .value-review::before {
-  content: '';
-  display: inline-block;
-  width: 14px;
-  height: 2px;
-  margin-right: 6px;
-  vertical-align: middle;
+.value-recommended-svg {
+  fill: var(--zone-recommended);
+}
+
+.value-review-svg {
+  fill: var(--zone-review);
 }
 
 .boundary-values .value-recommended::before {
@@ -671,7 +680,7 @@
 }
 
 .boundary-note {
-  margin-top: 8px;
+  margin-top: 2px;
   font-size: 12px;
   line-height: 1.6;
   color: var(--ink-3);
@@ -683,7 +692,7 @@
 
 .action-card,
 .why-card {
-  padding: 20px 24px;
+  padding: 16px 24px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -695,7 +704,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 6px 16px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .card-title {
@@ -727,11 +736,15 @@
 }
 
 .action-list {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .action-item {
-  padding: 12px 0;
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  align-items: start;
+  gap: 0 12px;
+  padding: 10px 0;
 }
 
 .action-item + .action-item {
@@ -739,6 +752,7 @@
 }
 
 .action-label {
+  padding-top: 7px;
   font-size: 12px;
   color: var(--ink-3);
 }
@@ -748,6 +762,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.action-row + .action-row {
   margin-top: 4px;
 }
 
@@ -778,7 +795,7 @@
 }
 
 .action-none {
-  margin-top: 4px;
+  padding-top: 5px;
   font-size: 14px;
   color: var(--ink-3);
 }

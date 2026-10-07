@@ -14,7 +14,7 @@ import { buyers } from '../src/data/buyers.js'
 import { policy } from '../src/data/policy.js'
 import { evaluateDeal, findFeasibleAdjustments } from '../src/engine/decisionEngine.js'
 import { buildDeterministicExplanation, getHistoryComparison } from '../src/lib/explanation.js'
-import { formatNTD, formatPercent } from '../src/lib/format.js'
+import { formatNTDCompact as formatMoney, formatPercent } from '../src/lib/format.js'
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses'
 const DEFAULT_MODEL = 'gpt-6-luna'
@@ -63,6 +63,7 @@ export function buildFacts(buyer, deal) {
   const fallback = buildDeterministicExplanation(buyer, evaluation)
 
   // 只給 AI「顯示用文字」，不給原始風險機率，避免 AI 重新解讀或計算
+  // 金額已由引擎算好，這裡只轉成與網頁相同的精簡顯示格式（例如 NT$6.5M）
   const facts = {
     buyer: {
       name: buyer.name,
@@ -75,28 +76,28 @@ export function buildFacts(buyer, deal) {
       recent_payment_trend: buyer.recentPaymentTrendLabel,
       external_credit_summary: buyer.externalCreditSummary,
       industry_outlook: buyer.industryOutlookLabel,
-      typical_order_amount: buyer.typicalOrderAmount === null ? '尚無資料' : formatNTD(buyer.typicalOrderAmount),
+      typical_order_amount: buyer.typicalOrderAmount === null ? '尚無資料' : formatMoney(buyer.typicalOrderAmount),
       typical_payment_term: buyer.typicalPaymentTermDays === null ? '尚無資料' : `${buyer.typicalPaymentTermDays} 天`,
-      current_exposure: formatNTD(buyer.currentExposure),
+      current_exposure: formatMoney(buyer.currentExposure),
     },
     deal: {
-      amount: formatNTD(deal.dealAmount),
+      amount: formatMoney(deal.dealAmount),
       payment_term: `Net${deal.paymentTermDays}`,
       deposit: formatPercent(deal.depositRatio),
     },
     engine_result: {
       zone: ZONE_TEXT[evaluation.zone],
       requires_manual_review: evaluation.requiresManualReview,
-      unsecured_exposure: formatNTD(evaluation.unsecuredExposure),
-      policy_adjusted_exposure_after_deal: formatNTD(evaluation.policyAdjustedExposure),
-      recommended_limit: formatNTD(evaluation.recommendedLimit),
-      review_limit: formatNTD(evaluation.reviewLimit),
+      unsecured_exposure: formatMoney(evaluation.unsecuredExposure),
+      policy_adjusted_exposure_after_deal: formatMoney(evaluation.policyAdjustedExposure),
+      recommended_limit: formatMoney(evaluation.recommendedLimit),
+      review_limit: formatMoney(evaluation.reviewLimit),
       amount_vs_typical: history.hasHistory ? `${history.amountRatio.toFixed(1)} 倍` : '尚無資料',
       term_vs_typical: history.hasHistory ? `${history.termDiffDays >= 0 ? '+' : ''}${history.termDiffDays} 天` : '尚無資料',
     },
     single_variable_adjustments_to_recommended: {
       deposit: adjustments.deposit.recommended === null ? '無法只靠訂金達成' : `訂金至少 ${formatPercent(adjustments.deposit.recommended)}`,
-      amount: adjustments.amount.recommended === null ? '無法只靠金額達成' : `金額不超過 ${formatNTD(adjustments.amount.recommended)}`,
+      amount: adjustments.amount.recommended === null ? '無法只靠金額達成' : `金額不超過 ${formatMoney(adjustments.amount.recommended)}`,
       payment_term: adjustments.paymentTerm.recommended === null ? '無法只靠帳期達成' : `帳期 Net${adjustments.paymentTerm.recommended}`,
       no_adjustment_needed: adjustments.noAdjustmentNeeded,
     },

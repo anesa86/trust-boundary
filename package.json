@@ -8,9 +8,12 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "server": "node server/index.js",
+    "check:ai": "node server/check.js"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

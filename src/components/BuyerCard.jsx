@@ -19,6 +19,7 @@ export default function BuyerCard({ buyer }) {
   return (
     <section className="panel-section" aria-label="Buyer 狀態">
       <h2 className="buyer-name">{buyer.name}</h2>
+      <p className="buyer-name-en">{buyer.nameEn}</p>
       <p className="buyer-tenure">
         {buyer.relationshipYears > 0
           ? `合作 ${buyer.relationshipYears} 年`

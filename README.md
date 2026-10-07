@@ -260,4 +260,4 @@ ml-evidence/       付款風險方法驗證實驗（不含原始資料）
 
 本 Prototype 為 2026 全國大學校院 AI 數位貿易創新應用競賽提案之實作驗證。
 
-> **【待補】Live demo URL**：部署完成後補上。
+**Live demo**：<https://trust-boundary.onrender.com>（Render 免費方案；閒置一段時間後，第一次開啟約需 30～60 秒）

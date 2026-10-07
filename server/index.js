@@ -2,9 +2,14 @@
 // 信任邊界 AI 說明 server
 // 啟動方式：npm run server
 // =====================================================
+// 開發時：只提供 /api，網站由 npm run dev 提供
+// Demo 時：如果已經打包（dist 資料夾存在），也同時提供網站，
+//          只要開這一個 server 就能使用（見 啟動信任邊界.bat）
 // API key 只在這裡讀取（server 端 .env），絕不送到瀏覽器。
 
 import process from 'node:process'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
 import express from 'express'
 import { explainDeal } from './explainService.js'
 
@@ -44,6 +49,21 @@ app.post('/api/explain', async (request, response) => {
   response.status(result.status).json(result.payload)
 })
 
+// 打包好的網站（dist）：存在才提供，不影響開發模式
+const distPath = path.resolve(import.meta.dirname, '..', 'dist')
+const hasDist = existsSync(path.join(distPath, 'index.html'))
+
+if (hasDist) {
+  app.use(express.static(distPath))
+  app.use((request, response, next) => {
+    if (request.method === 'GET' && !request.path.startsWith('/api')) {
+      response.sendFile(path.join(distPath, 'index.html'))
+      return
+    }
+    next()
+  })
+}
+
 // JSON 格式錯誤等例外：回傳清楚訊息，不洩漏內部細節
 app.use((error, request, response, next) => {
   if (response.headersSent) {
@@ -54,5 +74,8 @@ app.use((error, request, response, next) => {
 
 app.listen(PORT, () => {
   console.log(`信任邊界 server 已啟動：http://localhost:${PORT}`)
+  if (hasDist) {
+    console.log(`網站：http://localhost:${PORT}（使用打包版本）`)
+  }
   console.log(`AI 說明：${process.env.OPENAI_API_KEY ? '已設定 API key' : '未設定 API key（使用 fallback）'}`)
 })

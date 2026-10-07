@@ -1,9 +1,14 @@
 import { buildDeterministicExplanation, getHistoryComparison } from '../lib/explanation.js'
 import { formatNTDCompact } from '../lib/format.js'
 
-export default function WhyPanel({ buyer, evaluation }) {
+export default function WhyPanel({ buyer, evaluation, ai, onRequestAi }) {
   const history = getHistoryComparison(buyer, evaluation)
-  const explanation = buildDeterministicExplanation(buyer, evaluation)
+  const ruleExplanation = buildDeterministicExplanation(buyer, evaluation)
+
+  // 只有 AI 成功時才換成 AI 說明；其他狀態一律顯示規則說明
+  const isAi = ai.status === 'success'
+  const explanation = isAi ? ai.explanation : ruleExplanation
+  const isLoading = ai.status === 'loading'
 
   return (
     <section className="why-card" aria-label="原因說明">
@@ -50,8 +55,25 @@ export default function WhyPanel({ buyer, evaluation }) {
         </p>
       )}
 
-      <div className="explanation">
-        <p className="explanation-source">說明（依規則產生，非 AI）</p>
+      <div className="explanation" aria-live="polite" aria-busy={isLoading}>
+        <div className="explanation-head">
+          <p className="explanation-source">{isAi ? 'AI 整理' : '依規則產生'}</p>
+          {!isAi && (
+            <button
+              type="button"
+              className="button-quiet"
+              disabled={isLoading}
+              onClick={onRequestAi}
+            >
+              {isLoading ? 'AI 整理中…' : '用 AI 整理說明'}
+            </button>
+          )}
+        </div>
+
+        {ai.status === 'error' && (
+          <p className="explanation-notice">AI 暫時無法使用，目前顯示依規則產生的說明</p>
+        )}
+
         <p className="explanation-summary">{explanation.summary}</p>
         {explanation.key_reasons.length > 0 && (
           <ul className="explanation-reasons">
